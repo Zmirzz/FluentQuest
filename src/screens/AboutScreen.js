@@ -3,15 +3,18 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-nati
 import { StatusBar } from 'expo-status-bar';
 import { MaterialIcons } from '@expo/vector-icons';
 import { defaultTheme, commonStyles } from '../utils/theme';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 /**
  * AboutScreen provides information about the FluentQuest game
  * Explains the purpose and how to play
  */
 const AboutScreen = ({ navigation }) => {
+  const insets = useSafeAreaInsets();
+
   return (
     <ScrollView style={styles.scrollContainer}>
-      <View style={styles.container}>
+      <View style={[styles.container, { paddingTop: Math.max(20, insets.top + 10) }]}>
         <StatusBar style="auto" />
         
         <View style={styles.header}>

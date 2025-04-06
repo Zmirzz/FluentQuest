@@ -4,6 +4,7 @@ import { StatusBar } from 'expo-status-bar';
 import { MaterialIcons } from '@expo/vector-icons';
 import { commonStyles, defaultTheme } from '../utils/theme';
 import { loadGameState, checkForNewDailyWord } from '../utils/gameState';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 /**
  * HomeScreen serves as the entry point to the FluentQuest game
@@ -13,6 +14,7 @@ const HomeScreen = ({ navigation }) => {
   const [gameState, setGameState] = useState(null);
   const [hasNewChallenge, setHasNewChallenge] = useState(false);
   const [loading, setLoading] = useState(true);
+  const insets = useSafeAreaInsets();
 
   useEffect(() => {
     // Load game state when component mounts
@@ -36,19 +38,22 @@ const HomeScreen = ({ navigation }) => {
 
   if (loading) {
     return (
-      <View style={[styles.container, styles.loadingContainer]}>
+      <View style={[styles.container, styles.loadingContainer, { paddingTop: insets.top }]}>
         <Text style={styles.loadingText}>Loading FluentQuest...</Text>
       </View>
     );
   }
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { paddingTop: Math.max(20, insets.top) }]}>
       <StatusBar style="auto" />
       
       <View style={styles.header}>
-        <Text style={styles.title}>FluentQuest</Text>
-        <Text style={styles.subtitle}>Discover the world through words</Text>
+        <Image 
+          source={require('../../assets/logo.png')} 
+          style={styles.logo} 
+          resizeMode="contain"
+        />
       </View>
 
       {gameState && (
@@ -125,16 +130,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 40,
   },
-  title: {
-    fontSize: 36,
-    fontWeight: 'bold',
-    color: defaultTheme.primary,
-    marginBottom: 8,
-  },
-  subtitle: {
-    fontSize: 18,
-    color: '#666',
-    textAlign: 'center',
+  logo: {
+    width: 300,
+    height: 100,
+    marginBottom: 10,
   },
   statsContainer: {
     flexDirection: 'row',

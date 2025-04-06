@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Platform } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { MaterialIcons } from '@expo/vector-icons';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 // Import components
 import WordCard from '../components/WordCard';
@@ -23,6 +24,7 @@ const PracticeModeScreen = ({ navigation }) => {
   const [guessResult, setGuessResult] = useState(null);
   const [revealed, setRevealed] = useState(false);
   const [theme, setTheme] = useState(defaultTheme);
+  const insets = useSafeAreaInsets();
 
   // Load a random word when component mounts
   useEffect(() => {
@@ -81,7 +83,7 @@ const PracticeModeScreen = ({ navigation }) => {
 
   return (
     <ScrollView style={styles.scrollContainer}>
-      <View style={styles.container}>
+      <View style={[styles.container, { paddingTop: Math.max(20, insets.top + 10) }]}>
         <StatusBar style="auto" />
         
         <View style={styles.header}>
@@ -227,4 +229,11 @@ const styles = StyleSheet.create({
   },
 });
 
-export default PracticeModeScreen;
+// Wrap the component with SafeAreaProvider to ensure insets are available
+export default function PracticeModeScreenWithSafeArea(props) {
+  return (
+    <SafeAreaView style={{ flex: 1 }} edges={['top']}>
+      <PracticeModeScreen {...props} />
+    </SafeAreaView>
+  );
+};

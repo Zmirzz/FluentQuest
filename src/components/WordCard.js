@@ -16,7 +16,7 @@ const WordCard = ({
 }) => {
   // Get theme based on country colors
   const theme = getCountryTheme(countryColors);
-  const textColor = getReadableTextColor(theme.primary);
+  const { color: textColor, style: textShadowStyle } = getReadableTextColor(theme.primary);
 
   return (
     <View 
@@ -26,10 +26,10 @@ const WordCard = ({
         { backgroundColor: theme.primary }
       ]}
     >
-      <Text style={[styles.word, { color: textColor }]}>{word}</Text>
+      <Text style={[styles.word, { color: textColor }, textShadowStyle]}>{word}</Text>
       
       {pronunciation && (
-        <Text style={[styles.pronunciation, { color: textColor }]}>
+        <Text style={[styles.pronunciation, { color: textColor }, textShadowStyle]}>
           /{pronunciation}/
         </Text>
       )}
@@ -41,7 +41,13 @@ const WordCard = ({
           style={[styles.revealButton, { backgroundColor: theme.secondary }]}
           onPress={onReveal}
         >
-          <Text style={[styles.revealButtonText, { color: getReadableTextColor(theme.secondary) }]}>
+          <Text 
+            style={[
+              styles.revealButtonText, 
+              { color: getReadableTextColor(theme.secondary).color },
+              getReadableTextColor(theme.secondary).style
+            ]}
+          >
             Reveal Answer
           </Text>
         </TouchableOpacity>

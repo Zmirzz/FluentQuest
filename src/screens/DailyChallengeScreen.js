@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { MaterialIcons } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 // Import components
 import WordCard from '../components/WordCard';
@@ -26,6 +27,7 @@ const DailyChallengeScreen = ({ navigation }) => {
   const [revealed, setRevealed] = useState(false);
   const [loading, setLoading] = useState(true);
   const [theme, setTheme] = useState(defaultTheme);
+  const insets = useSafeAreaInsets();
 
   useEffect(() => {
     // Load the daily challenge and game state
@@ -110,7 +112,7 @@ const DailyChallengeScreen = ({ navigation }) => {
 
   if (loading) {
     return (
-      <View style={[styles.container, styles.loadingContainer]}>
+      <View style={[styles.container, styles.loadingContainer, { paddingTop: insets.top }]}>
         <Text style={styles.loadingText}>Loading today's challenge...</Text>
       </View>
     );
@@ -118,7 +120,7 @@ const DailyChallengeScreen = ({ navigation }) => {
 
   if (!dailyWord) {
     return (
-      <View style={[styles.container, styles.errorContainer]}>
+      <View style={[styles.container, styles.errorContainer, { paddingTop: insets.top }]}>
         <Text style={styles.errorText}>Failed to load today's challenge</Text>
         <TouchableOpacity 
           style={[styles.button, { backgroundColor: defaultTheme.primary }]}
@@ -132,7 +134,7 @@ const DailyChallengeScreen = ({ navigation }) => {
 
   return (
     <ScrollView style={styles.scrollContainer}>
-      <View style={styles.container}>
+      <View style={[styles.container, { paddingTop: Math.max(20, insets.top + 10) }]}>
         <StatusBar style="auto" />
         
         <View style={styles.header}>

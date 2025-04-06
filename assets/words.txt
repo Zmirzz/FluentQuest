@@ -1,0 +1,100 @@
+1. Hola
+2. Merci
+3. Danke
+4. Ciao
+5. Konnichiwa
+6. Annyeong
+7. Zdravstvuyte
+8. Namaste
+9. Olá
+10. Hej
+11. Salam
+12. Shukran
+13. Sawubona
+14. Xin chào
+15. Sawasdee
+16. Ahoj
+17. Takk
+18. Spasibo
+19. Efharisto
+20. Gracias
+21. Selamat
+22. Halo
+23. Dzień dobry
+24. Bom dia
+25. Dobro jutro
+26. Labas
+27. Kamusta
+28. Mingalaba
+29. Tere
+30. Hoi
+31. Ni hao
+32. Privet
+33. Czesc
+34. Yassou
+35. Jambo
+36. Guten Tag
+37. Buongiorno
+38. Bonjour
+39. God dag
+40. Zdravo
+41. Sveiki
+42. Barev
+43. Hallo
+44. Sannu
+45. Marhaba
+46. Kia ora
+47. Salaam
+48. Shalom
+49. Sabaidee
+50. Anyoung
+51. Ola
+52. Hae
+53. Selam
+54. Geia
+55. Hei
+56. Alo
+57. Namaskar
+58. Habari
+59. Tjena
+60. Salve
+61. Szia
+62. Ave
+63. Buna
+64. Zdravey
+65. Moikka
+66. Hujambo
+67. Kumusta
+68. Parev
+69. Buna ziua
+70. Aloha
+71. Hello
+72. Hi
+73. Yo
+74. Sup
+75. Hey
+76. Ahoy
+77. Wassup
+78. G’day
+79. Yello
+80. Peace
+81. Greetings
+82. Whaddup
+83. Top of the morning
+84. Howdy
+85. Wazzup
+86. What’s good
+87. Cheerio
+88. Allo
+89. Hola amigo
+90. Bonjourno
+91. Holla
+92. Namaskaram
+93. Mabuhay
+94. Ni hao ma
+95. Anyoung haseyo
+96. Buenas
+97. Que tal
+98. Cześć
+99. Ahlan
+100. Bula

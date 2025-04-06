@@ -42,7 +42,7 @@ export const getCountryTheme = (countryColors = []) => {
 /**
  * Get text color that ensures readability on a given background color
  * @param {string} backgroundColor - Hex color code
- * @returns {string} White or black depending on background brightness
+ * @returns {Object} Text color and text shadow style for optimal visibility
  */
 export const getReadableTextColor = (backgroundColor) => {
   // Remove the hash if it exists
@@ -56,9 +56,25 @@ export const getReadableTextColor = (backgroundColor) => {
   // Calculate brightness (YIQ formula)
   const brightness = (r * 299 + g * 587 + b * 114) / 1000;
   
-  // Return black for bright backgrounds, white for dark backgrounds
-  return brightness > 128 ? '#000000' : '#FFFFFF';
+  // Calculate contrast ratio (WCAG formula)
+  // For better accessibility, we use a more strict threshold
+  const contrastThreshold = 150;
+  
+  // Determine text color based on background brightness
+  const textColor = brightness > contrastThreshold ? '#000000' : '#FFFFFF';
+  
+  // Add text shadow for better visibility in all cases
+  // This ensures text is visible even on problematic backgrounds like white on light blue
+  const textShadowColor = textColor === '#FFFFFF' ? 'rgba(0, 0, 0, 0.75)' : 'rgba(255, 255, 255, 0.75)';
+  const textShadowStyle = {
+    textShadowColor: textShadowColor,
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 3
+  };
+  
+  return { color: textColor, style: textShadowStyle };
 };
+
 
 // Common styles used throughout the app
 export const commonStyles = {
