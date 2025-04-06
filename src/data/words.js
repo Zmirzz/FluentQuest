@@ -146,7 +146,7 @@ export const words = [
     id: 11,
     word: 'Fika',
     pronunciation: 'fee-ka',
-    meaning: 'A coffee break that's more about socializing than drinking coffee',
+    meaning: 'A coffee break that\'s more about socializing than drinking coffee',
     countryOfOrigin: 'Sweden',
     countryColors: ['#006AA7', '#FECC00'], // Swedish flag colors (blue and yellow)
     hints: [
@@ -154,7 +154,7 @@ export const words = [
       'Involves pastries',
       'More about connection than caffeine'
     ],
-    contextUsage: 'The team's daily fika has improved office morale and communication.'
+    contextUsage: 'The team\'s daily fika has improved office morale and communication.'
   },
   {
     id: 12,
@@ -194,7 +194,7 @@ export const words = [
     hints: [
       'One of the most difficult words to translate',
       'Describes a specific type of nonverbal communication',
-      'From one of the world's most endangered languages'
+      'From one of the world\'s most endangered languages'
     ],
     contextUsage: 'There was a moment of mamihlapinatapai between them at the door, both wanting a goodnight kiss.'
   },
@@ -280,13 +280,13 @@ export const words = [
       'Often directed at babies or puppies',
       'Has no direct English equivalent'
     ],
-    contextUsage: 'The baby's chubby cheeks gave her such gigil that she couldn't help but gently pinch them.'
+    contextUsage: 'The baby\'s chubby cheeks gave her such gigil that she couldn\'t help but gently pinch them.'
   },
   {
     id: 21,
     word: 'Tartle',
     pronunciation: 'tar-tul',
-    meaning: 'The hesitation when introducing someone whose name you can't recall',
+    meaning: 'The hesitation when introducing someone whose name you can\'t recall',
     countryOfOrigin: 'Scotland',
     countryColors: ['#005EB8', '#FFFFFF'], // Scottish flag colors (blue and white)
     hints: [
@@ -328,7 +328,7 @@ export const words = [
     id: 24,
     word: 'Cafuné',
     pronunciation: 'ka-foo-neh',
-    meaning: 'The act of tenderly running your fingers through someone's hair',
+    meaning: 'The act of tenderly running your fingers through someone\'s hair',
     countryOfOrigin: 'Brazil',
     countryColors: ['#009B3A', '#FEDF00', '#002776'], // Brazilian flag colors (green, yellow, blue)
     hints: [
@@ -370,7 +370,7 @@ export const words = [
     id: 27,
     word: 'Nunchi',
     pronunciation: 'noon-chee',
-    meaning: 'The art of listening and gauging another's mood in order to respond appropriately in social situations',
+    meaning: 'The art of listening and gauging another\'s mood in order to respond appropriately in social situations',
     countryOfOrigin: 'South Korea',
     countryColors: ['#FFFFFF', '#000000', '#C60C30', '#003478'], // South Korean flag colors (white, black, red, blue)
     hints: [
@@ -392,13 +392,13 @@ export const words = [
       'From a small island culture',
       'Involves gradual accumulation'
     ],
-    contextUsage: 'He didn't realize he was a victim of tingo until he noticed how many of his tools were now in his neighbor's garage.'
+    contextUsage: 'He didn\'t realize he was a victim of tingo until he noticed how many of his tools were now in his neighbor\'s garage.'
   },
   {
     id: 29,
     word: 'Litost',
     pronunciation: 'lee-tost',
-    meaning: 'A state of agony and torment created by the sudden sight of one's own misery',
+    meaning: 'A state of agony and torment created by the sudden sight of one\'s own misery',
     countryOfOrigin: 'Czech Republic',
     countryColors: ['#FFFFFF', '#D7141A', '#11457E'], // Czech flag colors (white, red, blue)
     hints: [
@@ -434,7 +434,7 @@ export const words = [
       'A traditional practice in spring',
       'Connects humans with nature'
     ],
-    contextUsage: 'Every May morning, she practiced gökotta, rising before dawn to hear the birds' morning chorus.'
+    contextUsage: 'Every May morning, she practiced gökotta, rising before dawn to hear the birds\' morning chorus.'
   },
   {
     id: 32,
@@ -560,7 +560,7 @@ export const words = [
       'Related to impermanence',
       'Often experienced when viewing cherry blossoms'
     ],
-    contextUsage: 'The aware of the sunset's fleeting colors made the moment all the more precious.'
+    contextUsage: 'The aware of the sunset\'s fleeting colors made the moment all the more precious.'
   },
   {
     id: 41,
@@ -574,7 +574,7 @@ export const words = [
       'Describes an emotional response to art',
       'Has supernatural connotations'
     ],
-    contextUsage: 'The dancer's performance had such duende that it brought tears to the audience's eyes.'
+    contextUsage: 'The dancer\'s performance had such duende that it brought tears to the audience\'s eyes.'
   },
   {
     id: 42,
