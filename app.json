@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "FluentQuest",
-    "slug": "FluentQuest",
+    "slug": "-fluentquest",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -23,6 +23,12 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "10dda201-a8f3-4b61-a58e-da6433964014"
+      }
+    },
+    "owner": "zmirz-org"
   }
 }
