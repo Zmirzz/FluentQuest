@@ -1,12 +1,7 @@
 # FluentQuest
 
 ## Project Description
-A brief description of what the project does.
-
-## Features
-- Feature 1
-- Feature 2
-- Feature 3
+Players are presented with a common phrase or word in a foreign language. They must guess its meaning and the country of origin. Hints can include contextual usage or related words.
 
 ## Installation
 1. Clone the repository
