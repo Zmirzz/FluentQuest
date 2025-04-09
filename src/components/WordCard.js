@@ -34,7 +34,9 @@ const WordCard = ({
         </Text>
       )}
 
-      {children}
+      <View style={revealed ? styles.revealedContent : null}>
+        {children}
+      </View>
 
       {!revealed && onReveal && (
         <TouchableOpacity 
@@ -73,6 +75,14 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
     marginBottom: 16,
     textAlign: 'center',
+  },
+  revealedContent: {
+    width: '100%',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.85)',
+    borderRadius: 8,
+    padding: 10,
+    marginTop: 10,
   },
   revealButton: {
     paddingVertical: 10,

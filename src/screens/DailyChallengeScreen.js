@@ -157,8 +157,8 @@ const DailyChallengeScreen = ({ navigation }) => {
           {revealed && (
             <View style={styles.revealedInfo}>
               <Text style={styles.meaningText}>{dailyWord.meaning}</Text>
-              <Text style={styles.originText}>Origin: {dailyWord.countryOfOrigin}</Text>
-              <Text style={styles.usageText}>Usage: {dailyWord.contextUsage}</Text>
+              <Text style={styles.originText}><Text style={styles.labelText}>Origin:</Text> {dailyWord.countryOfOrigin}</Text>
+              <Text style={styles.usageText}><Text style={styles.labelText}>Usage:</Text> {dailyWord.contextUsage}</Text>
             </View>
           )}
         </WordCard>
@@ -245,25 +245,35 @@ const styles = StyleSheet.create({
   revealedInfo: {
     padding: 15,
     alignItems: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    borderRadius: 8,
+    marginHorizontal: 10,
   },
   meaningText: {
     fontSize: 18,
-    fontWeight: '500',
+    fontWeight: '600',
     textAlign: 'center',
     marginBottom: 10,
-    color: 'white',
+    color: '#333333',
+    textShadowColor: 'rgba(255, 255, 255, 0.5)',
+    textShadowOffset: { width: 0.5, height: 0.5 },
+    textShadowRadius: 1,
   },
   originText: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: '500',
     marginBottom: 10,
-    color: 'white',
+    color: '#333333',
   },
   usageText: {
     fontSize: 14,
     fontStyle: 'italic',
     textAlign: 'center',
-    color: 'white',
+    color: '#333333',
+  },
+  labelText: {
+    fontWeight: 'bold',
+    color: defaultTheme.primary,
   },
   button: {
     ...commonStyles.button,

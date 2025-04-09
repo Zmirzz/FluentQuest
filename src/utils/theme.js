@@ -45,31 +45,54 @@ export const getCountryTheme = (countryColors = []) => {
  * @returns {Object} Text color and text shadow style for optimal visibility
  */
 export const getReadableTextColor = (backgroundColor) => {
+  // Handle invalid or missing color values
+  if (!backgroundColor || typeof backgroundColor !== 'string') {
+    backgroundColor = defaultTheme.primary;
+  }
+  
   // Remove the hash if it exists
   const hex = backgroundColor.replace('#', '');
   
   // Convert hex to RGB
-  const r = parseInt(hex.substr(0, 2), 16);
-  const g = parseInt(hex.substr(2, 2), 16);
-  const b = parseInt(hex.substr(4, 2), 16);
+  let r, g, b;
+  try {
+    r = parseInt(hex.substr(0, 2), 16);
+    g = parseInt(hex.substr(2, 2), 16);
+    b = parseInt(hex.substr(4, 2), 16);
+    
+    // If any value is NaN, use default color
+    if (isNaN(r) || isNaN(g) || isNaN(b)) {
+      r = 74; // Default primary color values (4A6FA5)
+      g = 111;
+      b = 165;
+    }
+  } catch (e) {
+    // Fallback to default color if parsing fails
+    r = 74;
+    g = 111;
+    b = 165;
+  }
   
   // Calculate brightness (YIQ formula)
   const brightness = (r * 299 + g * 587 + b * 114) / 1000;
   
   // Calculate contrast ratio (WCAG formula)
   // For better accessibility, we use a more strict threshold
-  const contrastThreshold = 150;
+  const contrastThreshold = 180; // Increased for better contrast
   
   // Determine text color based on background brightness
   const textColor = brightness > contrastThreshold ? '#000000' : '#FFFFFF';
   
-  // Add text shadow for better visibility in all cases
-  // This ensures text is visible even on problematic backgrounds like white on light blue
-  const textShadowColor = textColor === '#FFFFFF' ? 'rgba(0, 0, 0, 0.75)' : 'rgba(255, 255, 255, 0.75)';
+  // Create text style with shadow and outline for better visibility
+  // This ensures text is visible regardless of background color
   const textShadowStyle = {
-    textShadowColor: textShadowColor,
+    color: textColor,
+    textShadowColor: textColor === '#FFFFFF' ? 'rgba(0, 0, 0, 0.9)' : 'rgba(255, 255, 255, 0.9)',
     textShadowOffset: { width: 1, height: 1 },
-    textShadowRadius: 3
+    textShadowRadius: textColor === '#FFFFFF' ? 2 : 1.5,
+    letterSpacing: 0.5,
+    // Add additional styles for better readability
+    fontWeight: textColor === '#FFFFFF' ? 'bold' : '600'
   };
   
   return { color: textColor, style: textShadowStyle };
