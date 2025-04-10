@@ -1,20 +1,21 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, TextInput, StyleSheet, TouchableOpacity, Switch } from 'react-native';
 import { commonStyles } from '../utils/theme';
 
 /**
  * GuessInput component allows players to input their guesses
- * for word meaning and country of origin
+ * Primary focus is on country of origin with optional definition for bonus points
  */
 const GuessInput = ({ onSubmitGuess, theme, disabled = false }) => {
   const [meaningGuess, setMeaningGuess] = useState('');
   const [countryGuess, setCountryGuess] = useState('');
   const [error, setError] = useState('');
+  const [showDefinitionInput, setShowDefinitionInput] = useState(false);
 
   const handleSubmit = () => {
-    // Basic validation
-    if (!meaningGuess.trim() || !countryGuess.trim()) {
-      setError('Please enter both a meaning and country of origin');
+    // Basic validation - only country is required now
+    if (!countryGuess.trim()) {
+      setError('Please enter the country of origin');
       return;
     }
 
@@ -34,17 +35,7 @@ const GuessInput = ({ onSubmitGuess, theme, disabled = false }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.label}>What do you think it means?</Text>
-      <TextInput
-        style={[styles.input, { borderColor: theme.primary }]}
-        value={meaningGuess}
-        onChangeText={setMeaningGuess}
-        placeholder="Enter your guess for the meaning"
-        multiline
-        disabled={disabled}
-      />
-
-      <Text style={styles.label}>Country of origin?</Text>
+      <Text style={styles.mainLabel}>Country of origin?</Text>
       <TextInput
         style={[styles.input, { borderColor: theme.primary }]}
         value={countryGuess}
@@ -52,6 +43,33 @@ const GuessInput = ({ onSubmitGuess, theme, disabled = false }) => {
         placeholder="Enter the country of origin"
         disabled={disabled}
       />
+
+      <View style={styles.bonusSection}>
+        <View style={styles.switchContainer}>
+          <Text style={styles.bonusLabel}>Try for bonus points?</Text>
+          <Switch
+            value={showDefinitionInput}
+            onValueChange={setShowDefinitionInput}
+            trackColor={{ false: '#767577', true: theme.primary + '80' }}
+            thumbColor={showDefinitionInput ? theme.primary : '#f4f3f4'}
+            disabled={disabled}
+          />
+        </View>
+        
+        {showDefinitionInput && (
+          <>
+            <Text style={styles.label}>What do you think it means?</Text>
+            <TextInput
+              style={[styles.input, { borderColor: theme.primary }]}
+              value={meaningGuess}
+              onChangeText={setMeaningGuess}
+              placeholder="Enter your guess for the definition (for bonus points)"
+              multiline
+              disabled={disabled}
+            />
+          </>
+        )}
+      </View>
 
       {error ? <Text style={styles.errorText}>{error}</Text> : null}
 
@@ -71,10 +89,33 @@ const styles = StyleSheet.create({
     width: '100%',
     marginVertical: 15,
   },
+  mainLabel: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 5,
+    color: '#333',
+  },
   label: {
     fontSize: 16,
     fontWeight: 'bold',
     marginBottom: 5,
+  },
+  bonusLabel: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginRight: 10,
+  },
+  bonusSection: {
+    marginTop: 15,
+    marginBottom: 10,
+    padding: 10,
+    backgroundColor: '#f5f5f5',
+    borderRadius: 8,
+  },
+  switchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
   },
   input: {
     ...commonStyles.input,

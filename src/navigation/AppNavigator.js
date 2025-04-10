@@ -5,8 +5,9 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 // Import screens
 import HomeScreen from '../screens/HomeScreen';
 import DailyChallengeScreen from '../screens/DailyChallengeScreen';
-import PracticeModeScreen from '../screens/PracticeModeScreen';
+import EndlessModeScreen from '../screens/EndlessModeScreen';
 import AboutScreen from '../screens/AboutScreen';
+import LeaderboardScreen from '../screens/LeaderboardScreen';
 
 // Create stack navigator
 const Stack = createNativeStackNavigator();
@@ -28,8 +29,9 @@ const AppNavigator = () => {
       >
         <Stack.Screen name="Home" component={HomeScreen} />
         <Stack.Screen name="DailyChallenge" component={DailyChallengeScreen} />
-        <Stack.Screen name="PracticeMode" component={PracticeModeScreen} />
+        <Stack.Screen name="EndlessMode" component={EndlessModeScreen} />
         <Stack.Screen name="About" component={AboutScreen} />
+        <Stack.Screen name="Leaderboard" component={LeaderboardScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

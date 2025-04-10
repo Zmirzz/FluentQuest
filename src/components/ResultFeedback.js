@@ -4,40 +4,27 @@ import { MaterialIcons } from '@expo/vector-icons';
 
 /**
  * ResultFeedback component displays feedback after a player submits a guess
- * Shows whether the meaning and country guesses were correct
+ * Primary focus is on country of origin with optional definition for bonus points
  */
 const ResultFeedback = ({ result, actualMeaning, actualCountry, theme }) => {
   if (!result) return null;
 
   const { meaningCorrect, countryCorrect } = result;
-  const allCorrect = meaningCorrect && countryCorrect;
+  // Country is the primary objective, meaning is bonus
+  const primarySuccess = countryCorrect;
 
   return (
     <View style={styles.container}>
-      <View style={[styles.resultCard, { backgroundColor: allCorrect ? theme.success + '20' : theme.error + '20' }]}>
+      <View style={[styles.resultCard, { backgroundColor: primarySuccess ? theme.success + '20' : theme.error + '20' }]}>
         <View style={styles.header}>
           <MaterialIcons 
-            name={allCorrect ? 'check-circle' : 'error'} 
+            name={primarySuccess ? 'check-circle' : 'error'} 
             size={24} 
-            color={allCorrect ? theme.success : theme.error} 
+            color={primarySuccess ? theme.success : theme.error} 
           />
-          <Text style={[styles.headerText, { color: allCorrect ? theme.success : theme.error }]}>
-            {allCorrect ? 'Correct!' : 'Not quite right'}
+          <Text style={[styles.headerText, { color: primarySuccess ? theme.success : theme.error }]}>
+            {primarySuccess ? 'Correct Country!' : 'Incorrect Country'}
           </Text>
-        </View>
-
-        <View style={styles.resultItem}>
-          <View style={styles.resultRow}>
-            <MaterialIcons 
-              name={meaningCorrect ? 'check-circle' : 'cancel'} 
-              size={20} 
-              color={meaningCorrect ? theme.success : theme.error} 
-            />
-            <Text style={styles.resultLabel}>Meaning:</Text>
-          </View>
-          {!meaningCorrect && (
-            <Text style={styles.actualText}>Actual meaning: {actualMeaning}</Text>
-          )}
         </View>
 
         <View style={styles.resultItem}>
@@ -53,6 +40,25 @@ const ResultFeedback = ({ result, actualMeaning, actualCountry, theme }) => {
             <Text style={styles.actualText}>Actual country: {actualCountry}</Text>
           )}
         </View>
+
+        {result.hasOwnProperty('meaningCorrect') && (
+          <View style={styles.bonusResultItem}>
+            <View style={styles.resultRow}>
+              <MaterialIcons 
+                name={meaningCorrect ? 'stars' : 'cancel'} 
+                size={20} 
+                color={meaningCorrect ? '#FFD700' : theme.error} 
+              />
+              <Text style={styles.bonusLabel}>Bonus - Definition:</Text>
+            </View>
+            {!meaningCorrect && (
+              <Text style={styles.actualText}>Actual meaning: {actualMeaning}</Text>
+            )}
+            {meaningCorrect && (
+              <Text style={styles.bonusText}>+5 bonus points!</Text>
+            )}
+          </View>
+        )}
       </View>
     </View>
   );

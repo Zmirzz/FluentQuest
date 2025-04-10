@@ -7,6 +7,8 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 // Import navigation
 import AppNavigator from './src/navigation/AppNavigator';
+import UsernameModal from './src/components/UsernameModal';
+import { hasUsername, saveUsername } from './src/utils/gameState';
 
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
@@ -42,9 +44,26 @@ export default function App() {
     }
   }, [appIsReady]);
 
+  const [showUsernameModal, setShowUsernameModal] = useState(false);
+  
+  useEffect(() => {
+    // Check if username is already set
+    const checkUsername = async () => {
+      const hasExistingUsername = await hasUsername();
+      setShowUsernameModal(!hasExistingUsername);
+    };
+    
+    checkUsername();
+  }, []);
+
   if (!appIsReady) {
     return null;
   }
+  
+  const handleUsernameSubmit = async (username) => {
+    await saveUsername(username);
+    setShowUsernameModal(false);
+  };
 
   return (
     <SafeAreaProvider>
@@ -52,6 +71,10 @@ export default function App() {
         <StatusBar style="auto" />
         <AppNavigator />
       </View>
+      <UsernameModal 
+        visible={showUsernameModal} 
+        onSubmit={handleUsernameSubmit} 
+      />
     </SafeAreaProvider>
   );
 }

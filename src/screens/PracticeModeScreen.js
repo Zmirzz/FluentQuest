@@ -53,18 +53,21 @@ const PracticeModeScreen = ({ navigation }) => {
   const handleSubmitGuess = (guess) => {
     if (!currentWord) return;
 
-    // Check if the meaning is correct (simple substring check for demo purposes)
-    const meaningCorrect = currentWord.meaning.toLowerCase().includes(guess.meaningGuess.toLowerCase());
-    
-    // Check if country is correct (case insensitive exact match)
+    // Check if country is correct (case insensitive exact match) - primary objective
     const countryCorrect = guess.countryGuess.toLowerCase() === currentWord.countryOfOrigin.toLowerCase();
+    
+    // Check if the meaning is correct (simple substring check) - bonus objective
+    // Only check meaning if it was provided
+    const meaningCorrect = guess.meaningGuess ? 
+      currentWord.meaning.toLowerCase().includes(guess.meaningGuess.toLowerCase()) : 
+      false;
     
     // Set the result
     const result = { meaningCorrect, countryCorrect };
     setGuessResult(result);
     
-    // If either is correct, reveal the answer
-    if (meaningCorrect || countryCorrect) {
+    // Reveal the answer if country is correct (primary objective)
+    if (countryCorrect) {
       setRevealed(true);
     }
   };

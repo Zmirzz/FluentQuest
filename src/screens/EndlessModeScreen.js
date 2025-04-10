@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Platform } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { MaterialIcons } from '@expo/vector-icons';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 // Import components
 import WordCard from '../components/WordCard';
@@ -11,68 +11,67 @@ import HintButton from '../components/HintButton';
 import ResultFeedback from '../components/ResultFeedback';
 
 // Import utilities
-import { getCurrentDailyChallenge } from '../utils/gameState';
-import { loadGameState, updateGameStateAfterGuess, saveGameState } from '../utils/gameState';
+import { words } from '../data/words';
 import { getCountryTheme, defaultTheme, commonStyles } from '../utils/theme';
+import { loadGameState, updateGameStateAfterGuess, saveGameState } from '../utils/gameState';
 
 /**
- * DailyChallengeScreen is the main gameplay screen
- * Shows the daily word challenge and handles player guesses
+ * EndlessModeScreen allows players to practice with random words
+ * Similar to daily challenge but can be played multiple times
+ * Each correct word gives 1 point
  */
-const DailyChallengeScreen = ({ navigation }) => {
-  const [dailyWord, setDailyWord] = useState(null);
-  const [gameState, setGameState] = useState(null);
+const EndlessModeScreen = ({ navigation }) => {
+  const [currentWord, setCurrentWord] = useState(null);
   const [hintsUsed, setHintsUsed] = useState(0);
   const [guessResult, setGuessResult] = useState(null);
   const [revealed, setRevealed] = useState(false);
-  const [loading, setLoading] = useState(true);
   const [theme, setTheme] = useState(defaultTheme);
+  const [gameState, setGameState] = useState(null);
   const insets = useSafeAreaInsets();
 
+  // Load game state and a random word when component mounts
   useEffect(() => {
-    // Load the daily challenge and game state
-    const loadChallenge = async () => {
-      try {
-        // Get today's word challenge
-        const wordChallenge = getCurrentDailyChallenge();
-        setDailyWord(wordChallenge);
-        
-        // Set theme based on country colors
-        setTheme(getCountryTheme(wordChallenge.countryColors));
-        
-        // Load game state
-        const state = await loadGameState();
-        setGameState(state);
-        
-        // Check if this word has already been guessed today
-        const alreadyGuessed = state.wordsGuessed.includes(wordChallenge.id);
-        if (alreadyGuessed) {
-          setRevealed(true);
-        }
-      } catch (error) {
-        console.error('Error loading daily challenge:', error);
-      } finally {
-        setLoading(false);
-      }
+    const initialize = async () => {
+      // Load game state
+      const state = await loadGameState();
+      setGameState(state);
+      
+      // Load a random word
+      loadRandomWord();
     };
-
-    loadChallenge();
+    
+    initialize();
   }, []);
+
+  const loadRandomWord = () => {
+    // Get a random word from our collection
+    const randomIndex = Math.floor(Math.random() * words.length);
+    const randomWord = words[randomIndex];
+    
+    // Set the current word and theme
+    setCurrentWord(randomWord);
+    setTheme(getCountryTheme(randomWord.countryColors));
+    
+    // Reset state for new word
+    setHintsUsed(0);
+    setGuessResult(null);
+    setRevealed(false);
+  };
 
   const handleUseHint = (count) => {
     setHintsUsed(count);
   };
 
   const handleSubmitGuess = async (guess) => {
-    if (!dailyWord || !gameState) return;
+    if (!currentWord || !gameState) return;
 
     // Check if country is correct (case insensitive exact match) - primary objective
-    const countryCorrect = guess.countryGuess.toLowerCase() === dailyWord.countryOfOrigin.toLowerCase();
+    const countryCorrect = guess.countryGuess.toLowerCase() === currentWord.countryOfOrigin.toLowerCase();
     
     // Check if the meaning is correct (simple substring check) - bonus objective
     // Only check meaning if it was provided
     const meaningCorrect = guess.meaningGuess ? 
-      dailyWord.meaning.toLowerCase().includes(guess.meaningGuess.toLowerCase()) : 
+      currentWord.meaning.toLowerCase().includes(guess.meaningGuess.toLowerCase()) : 
       false;
     
     // Set the result
@@ -82,54 +81,30 @@ const DailyChallengeScreen = ({ navigation }) => {
     // Reveal the answer if country is correct (primary objective)
     if (countryCorrect) {
       setRevealed(true);
-    }
-    
-    // Update game state with the result object - true indicates this is a daily challenge (3 points)
-    const updatedState = await updateGameStateAfterGuess(
-      gameState,
-      result,
-      dailyWord.id,
-      hintsUsed,
-      true // This is a daily challenge, so 3 points
-    );
-    
-    // Save updated game state
-    setGameState(updatedState);
-    await saveGameState(updatedState);
-  };
-
-  const handleReveal = async () => {
-    setRevealed(true);
-    
-    // Update game state to mark this word as seen
-    if (gameState && !gameState.wordsGuessed.includes(dailyWord.id)) {
-      const updatedState = {
-        ...gameState,
-        wordsGuessed: [...gameState.wordsGuessed, dailyWord.id]
-      };
+      
+      // Update game state with the result object - false indicates this is endless mode (1 point)
+      const updatedState = await updateGameStateAfterGuess(
+        gameState,
+        result,
+        currentWord.id,
+        hintsUsed,
+        false // This is endless mode, so 1 point
+      );
+      
+      // Save updated game state
       setGameState(updatedState);
       await saveGameState(updatedState);
     }
   };
 
-  if (loading) {
-    return (
-      <View style={[styles.container, styles.loadingContainer, { paddingTop: insets.top }]}>
-        <Text style={styles.loadingText}>Loading today's challenge...</Text>
-      </View>
-    );
-  }
+  const handleReveal = () => {
+    setRevealed(true);
+  };
 
-  if (!dailyWord) {
+  if (!currentWord || !gameState) {
     return (
-      <View style={[styles.container, styles.errorContainer, { paddingTop: insets.top }]}>
-        <Text style={styles.errorText}>Failed to load today's challenge</Text>
-        <TouchableOpacity 
-          style={[styles.button, { backgroundColor: defaultTheme.primary }]}
-          onPress={() => navigation.goBack()}
-        >
-          <Text style={styles.buttonText}>Go Back</Text>
-        </TouchableOpacity>
+      <View style={[styles.container, styles.loadingContainer]}>
+        <Text style={styles.loadingText}>Loading endless mode...</Text>
       </View>
     );
   }
@@ -146,21 +121,21 @@ const DailyChallengeScreen = ({ navigation }) => {
           >
             <MaterialIcons name="arrow-back" size={24} color={theme.primary} />
           </TouchableOpacity>
-          <Text style={styles.title}>Daily Challenge</Text>
+          <Text style={styles.title}>Endless Mode</Text>
         </View>
 
         <WordCard 
-          word={dailyWord.word}
-          pronunciation={dailyWord.pronunciation}
-          countryColors={dailyWord.countryColors}
+          word={currentWord.word}
+          pronunciation={currentWord.pronunciation}
+          countryColors={currentWord.countryColors}
           revealed={revealed}
           onReveal={handleReveal}
         >
           {revealed && (
             <View style={styles.revealedInfo}>
-              <Text style={styles.meaningText}>{dailyWord.meaning}</Text>
-              <Text style={styles.originText}><Text style={styles.labelText}>Origin:</Text> {dailyWord.countryOfOrigin}</Text>
-              <Text style={styles.usageText}><Text style={styles.labelText}>Usage:</Text> {dailyWord.contextUsage}</Text>
+              <Text style={styles.meaningText}>{currentWord.meaning}</Text>
+              <Text style={styles.originText}><Text style={styles.labelText}>Origin:</Text> {currentWord.countryOfOrigin}</Text>
+              <Text style={styles.usageText}><Text style={styles.labelText}>Usage:</Text> {currentWord.contextUsage}</Text>
             </View>
           )}
         </WordCard>
@@ -168,7 +143,7 @@ const DailyChallengeScreen = ({ navigation }) => {
         {!revealed && (
           <>
             <HintButton 
-              hints={dailyWord.hints}
+              hints={currentWord.hints}
               onUseHint={handleUseHint}
               theme={theme}
             />
@@ -184,19 +159,28 @@ const DailyChallengeScreen = ({ navigation }) => {
         {guessResult && !revealed && (
           <ResultFeedback 
             result={guessResult}
-            actualMeaning={dailyWord.meaning}
-            actualCountry={dailyWord.countryOfOrigin}
+            actualMeaning={currentWord.meaning}
+            actualCountry={currentWord.countryOfOrigin}
             theme={theme}
           />
         )}
 
         {revealed && (
-          <TouchableOpacity 
-            style={[styles.button, { backgroundColor: theme.primary }]}
-            onPress={() => navigation.navigate('Home')}
-          >
-            <Text style={styles.buttonText}>Back to Home</Text>
-          </TouchableOpacity>
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity 
+              style={[styles.button, { backgroundColor: theme.primary }]}
+              onPress={loadRandomWord}
+            >
+              <Text style={styles.buttonText}>Try Another Word</Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity 
+              style={[styles.button, { backgroundColor: theme.secondary }]}
+              onPress={() => navigation.navigate('Home')}
+            >
+              <Text style={styles.buttonText}>Back to Home</Text>
+            </TouchableOpacity>
+          </View>
         )}
       </View>
     </ScrollView>
@@ -219,15 +203,6 @@ const styles = StyleSheet.create({
   loadingText: {
     fontSize: 18,
     color: defaultTheme.primary,
-  },
-  errorContainer: {
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  errorText: {
-    fontSize: 18,
-    color: defaultTheme.error,
-    marginBottom: 20,
   },
   header: {
     flexDirection: 'row',
@@ -277,9 +252,13 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: defaultTheme.primary,
   },
+  buttonContainer: {
+    marginTop: 20,
+    width: '100%',
+  },
   button: {
     ...commonStyles.button,
-    marginTop: 20,
+    marginVertical: 8,
   },
   buttonText: {
     color: 'white',
@@ -288,4 +267,11 @@ const styles = StyleSheet.create({
   },
 });
 
-export default DailyChallengeScreen;
+// Wrap the component with SafeAreaProvider to ensure insets are available
+export default function EndlessModeScreenWithSafeArea(props) {
+  return (
+    <SafeAreaView style={{ flex: 1 }} edges={['top']}>
+      <EndlessModeScreen {...props} />
+    </SafeAreaView>
+  );
+};

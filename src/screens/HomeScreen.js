@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { MaterialIcons } from '@expo/vector-icons';
 import { commonStyles, defaultTheme } from '../utils/theme';
-import { loadGameState, checkForNewDailyWord } from '../utils/gameState';
+import { loadGameState, checkForNewDailyWord, getUsername } from '../utils/gameState';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 /**
@@ -14,6 +14,7 @@ const HomeScreen = ({ navigation }) => {
   const [gameState, setGameState] = useState(null);
   const [hasNewChallenge, setHasNewChallenge] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [username, setUsername] = useState(null);
   const insets = useSafeAreaInsets();
 
   useEffect(() => {
@@ -26,6 +27,10 @@ const HomeScreen = ({ navigation }) => {
         // Check if there's a new daily word challenge
         const newChallenge = await checkForNewDailyWord();
         setHasNewChallenge(newChallenge);
+
+        // Get the username
+        const savedUsername = await getUsername();
+        setUsername(savedUsername);
       } catch (error) {
         console.error('Error loading game data:', error);
       } finally {
@@ -54,6 +59,11 @@ const HomeScreen = ({ navigation }) => {
           style={styles.logo} 
           resizeMode="contain"
         />
+        {username && (
+          <View style={styles.usernameContainer}>
+            <Text style={styles.usernameText}>Hi, {username}!</Text>
+          </View>
+        )}
       </View>
 
       {gameState && (
@@ -77,7 +87,7 @@ const HomeScreen = ({ navigation }) => {
 
       <View style={styles.buttonContainer}>
         <TouchableOpacity 
-          style={[styles.button, hasNewChallenge && styles.highlightedButton]}
+          style={[styles.button, styles.dailyChallengeButton]}
           onPress={() => navigation.navigate('DailyChallenge')}
         >
           <MaterialIcons name="translate" size={24} color="white" />
@@ -93,10 +103,18 @@ const HomeScreen = ({ navigation }) => {
 
         <TouchableOpacity 
           style={styles.button}
-          onPress={() => navigation.navigate('PracticeMode')}
+          onPress={() => navigation.navigate('EndlessMode')}
         >
-          <MaterialIcons name="school" size={24} color="white" />
-          <Text style={styles.buttonText}>Practice Mode</Text>
+          <MaterialIcons name="all-inclusive" size={24} color="white" />
+          <Text style={styles.buttonText}>Endless Mode</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity 
+          style={styles.button}
+          onPress={() => navigation.navigate('Leaderboard')}
+        >
+          <MaterialIcons name="emoji-events" size={24} color="white" />
+          <Text style={styles.buttonText}>Leaderboard</Text>
         </TouchableOpacity>
 
         <TouchableOpacity 
@@ -129,11 +147,29 @@ const styles = StyleSheet.create({
   header: {
     alignItems: 'center',
     marginBottom: 40,
+    width: '100%',
+    position: 'relative',
   },
   logo: {
     width: 300,
     height: 100,
     marginBottom: 10,
+  },
+  usernameContainer: {
+    position: 'absolute',
+    top: 10,
+    right: 20,
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 15,
+    borderWidth: 1,
+    borderColor: defaultTheme.primary,
+  },
+  usernameText: {
+    color: defaultTheme.primary,
+    fontWeight: 'bold',
+    fontSize: 14,
   },
   statsContainer: {
     flexDirection: 'row',
@@ -163,6 +199,9 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     paddingVertical: 15,
     paddingHorizontal: 20,
+  },
+  dailyChallengeButton: {
+    backgroundColor: defaultTheme.secondary, // Yellow color
   },
   buttonText: {
     ...commonStyles.buttonText,
