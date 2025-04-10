@@ -6,6 +6,6 @@ Players are presented with a common phrase or word in a foreign language. They m
 ## Installation
 1. Clone the repository
    ```bash
-   git clone https://github.com/yourusername/FluentQuest.git
+   git clone https://github.com/Zmirzz/FluentQuest.git
    cd FluentQuest
    npm install
