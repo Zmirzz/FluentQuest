@@ -4,7 +4,6 @@ import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
 import * as Font from 'expo-font';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { SpeedInsights } from '@vercel/speed-insights/react';
 
 // Import navigation
 import AppNavigator from './src/navigation/AppNavigator';
@@ -71,7 +70,6 @@ export default function App() {
       <View style={styles.container} onLayout={onLayoutRootView}>
         <StatusBar style="auto" />
         <AppNavigator />
-        <SpeedInsights />
       </View>
       <UsernameModal 
         visible={showUsernameModal} 
