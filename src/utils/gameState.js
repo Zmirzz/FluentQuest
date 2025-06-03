@@ -2,6 +2,50 @@ import * as SecureStore from 'expo-secure-store';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getDailyWord } from '../data/words';
 
+// Determine once whether SecureStore is available. When it isn't, all
+// storage operations will transparently fall back to AsyncStorage.
+let secureStoreAvailable = null;
+export const isSecureStoreAvailable = async () => {
+  if (secureStoreAvailable === null) {
+    try {
+      secureStoreAvailable = await SecureStore.isAvailableAsync();
+    } catch {
+      secureStoreAvailable = false;
+    }
+  }
+  return secureStoreAvailable;
+};
+
+// Helpers that automatically use SecureStore when available and
+// gracefully fall back to AsyncStorage otherwise.
+const setStorageItem = async (key, value) => {
+  const useSecure = await isSecureStoreAvailable();
+  if (useSecure) {
+    try {
+      await SecureStore.setItemAsync(key, value);
+      return;
+    } catch {
+      // If SecureStore fails unexpectedly, fall back to AsyncStorage.
+    }
+  }
+  await AsyncStorage.setItem(key, value);
+};
+
+const getStorageItem = async (key) => {
+  const useSecure = await isSecureStoreAvailable();
+  if (useSecure) {
+    try {
+      const value = await SecureStore.getItemAsync(key);
+      if (value !== null && value !== undefined) {
+        return value;
+      }
+    } catch {
+      // Fall back to AsyncStorage on failure.
+    }
+  }
+  return await AsyncStorage.getItem(key);
+};
+
 // Keys for storing game data
 const GAME_STATE_KEY = 'fluentquest_game_state';
 const LAST_PLAYED_DATE_KEY = 'fluentquest_last_played_date';
@@ -30,24 +74,11 @@ const defaultLeaderboard = {
  */
 export const saveGameState = async (gameState) => {
   try {
-    // Try to use SecureStore first, fall back to AsyncStorage if needed
-    try {
-      await SecureStore.setItemAsync(
-        GAME_STATE_KEY, 
-        JSON.stringify(gameState)
-      );
-    } catch (secureError) {
-      // Fall back to AsyncStorage
-      await AsyncStorage.setItem(GAME_STATE_KEY, JSON.stringify(gameState));
-    }
-    
-    // Also update the last played date
+    await setStorageItem(GAME_STATE_KEY, JSON.stringify(gameState));
+
+    // Update the last played date for daily word checks
     const today = new Date().toISOString().split('T')[0];
-    try {
-      await SecureStore.setItemAsync(LAST_PLAYED_DATE_KEY, today);
-    } catch (secureError) {
-      await AsyncStorage.setItem(LAST_PLAYED_DATE_KEY, today);
-    }
+    await setStorageItem(LAST_PLAYED_DATE_KEY, today);
   } catch (error) {
     console.error('Error saving game state:', error);
   }
@@ -59,16 +90,7 @@ export const saveGameState = async (gameState) => {
  */
 export const loadGameState = async () => {
   try {
-    let savedState = null;
-    
-    // Try SecureStore first
-    try {
-      savedState = await SecureStore.getItemAsync(GAME_STATE_KEY);
-    } catch (secureError) {
-      // Fall back to AsyncStorage
-      savedState = await AsyncStorage.getItem(GAME_STATE_KEY);
-    }
-    
+    const savedState = await getStorageItem(GAME_STATE_KEY);
     return savedState ? JSON.parse(savedState) : { ...defaultGameState };
   } catch (error) {
     console.error('Error loading game state:', error);
@@ -82,16 +104,8 @@ export const loadGameState = async () => {
  */
 export const checkForNewDailyWord = async () => {
   try {
-    let lastPlayedDate = null;
-    
-    // Try SecureStore first
-    try {
-      lastPlayedDate = await SecureStore.getItemAsync(LAST_PLAYED_DATE_KEY);
-    } catch (secureError) {
-      // Fall back to AsyncStorage
-      lastPlayedDate = await AsyncStorage.getItem(LAST_PLAYED_DATE_KEY);
-    }
-    
+    const lastPlayedDate = await getStorageItem(LAST_PLAYED_DATE_KEY);
+
     const today = new Date().toISOString().split('T')[0];
     return lastPlayedDate !== today;
   } catch (error) {
@@ -168,15 +182,7 @@ export const updateGameStateAfterGuess = async (currentState, result, wordId, hi
  */
 export const getLeaderboard = async () => {
   try {
-    let leaderboardData = null;
-    
-    // Try SecureStore first
-    try {
-      leaderboardData = await SecureStore.getItemAsync(LEADERBOARD_KEY);
-    } catch (secureError) {
-      // Fall back to AsyncStorage
-      leaderboardData = await AsyncStorage.getItem(LEADERBOARD_KEY);
-    }
+    const leaderboardData = await getStorageItem(LEADERBOARD_KEY);
     
     const leaderboard = leaderboardData ? JSON.parse(leaderboardData) : { ...defaultLeaderboard };
     
@@ -215,11 +221,7 @@ export const updateLeaderboard = async (score, username = null) => {
     // Get username from storage if not provided
     let playerName = username;
     if (!playerName) {
-      try {
-        playerName = await SecureStore.getItemAsync(USERNAME_KEY);
-      } catch (secureError) {
-        playerName = await AsyncStorage.getItem(USERNAME_KEY);
-      }
+      playerName = await getStorageItem(USERNAME_KEY);
     }
     
     // Use default name if still null
@@ -264,11 +266,7 @@ export const updateLeaderboard = async (score, username = null) => {
     leaderboard.lastUpdated = new Date().toISOString();
     
     // Save updated leaderboard
-    try {
-      await SecureStore.setItemAsync(LEADERBOARD_KEY, JSON.stringify(leaderboard));
-    } catch (secureError) {
-      await AsyncStorage.setItem(LEADERBOARD_KEY, JSON.stringify(leaderboard));
-    }
+    await setStorageItem(LEADERBOARD_KEY, JSON.stringify(leaderboard));
     
     return leaderboard;
   } catch (error) {
@@ -290,13 +288,9 @@ export const updateLeaderboardName = async (entryId, name) => {
     const entryIndex = leaderboard.entries.findIndex(entry => entry.id === entryId);
     if (entryIndex !== -1) {
       leaderboard.entries[entryIndex].name = name;
-      
+
       // Save updated leaderboard
-      try {
-        await SecureStore.setItemAsync(LEADERBOARD_KEY, JSON.stringify(leaderboard));
-      } catch (secureError) {
-        await AsyncStorage.setItem(LEADERBOARD_KEY, JSON.stringify(leaderboard));
-      }
+      await setStorageItem(LEADERBOARD_KEY, JSON.stringify(leaderboard));
     }
     
     return leaderboard;
@@ -312,13 +306,7 @@ export const updateLeaderboardName = async (entryId, name) => {
  */
 export const saveUsername = async (username) => {
   try {
-    // Try to use SecureStore first, fall back to AsyncStorage if needed
-    try {
-      await SecureStore.setItemAsync(USERNAME_KEY, username);
-    } catch (secureError) {
-      // Fall back to AsyncStorage
-      await AsyncStorage.setItem(USERNAME_KEY, username);
-    }
+    await setStorageItem(USERNAME_KEY, username);
     
     // Also update the username in the current game state
     const gameState = await loadGameState();
@@ -338,17 +326,7 @@ export const saveUsername = async (username) => {
  */
 export const getUsername = async () => {
   try {
-    let username = null;
-    
-    // Try SecureStore first
-    try {
-      username = await SecureStore.getItemAsync(USERNAME_KEY);
-    } catch (secureError) {
-      // Fall back to AsyncStorage
-      username = await AsyncStorage.getItem(USERNAME_KEY);
-    }
-    
-    return username;
+    return await getStorageItem(USERNAME_KEY);
   } catch (error) {
     console.error('Error getting username:', error);
     return null;
