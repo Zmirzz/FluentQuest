@@ -36,13 +36,13 @@ const GuessInput = ({ onSubmitGuess, theme, disabled = false }) => {
   return (
     <View style={styles.container}>
       <Text style={styles.mainLabel}>Country of origin?</Text>
-      <TextInput
-        style={[styles.input, { borderColor: theme.primary }]}
-        value={countryGuess}
-        onChangeText={setCountryGuess}
-        placeholder="Enter the country of origin"
-        disabled={disabled}
-      />
+        <TextInput
+          style={[styles.input, { borderColor: theme.primary }]}
+          value={countryGuess}
+          onChangeText={setCountryGuess}
+          placeholder="Enter the country of origin"
+          editable={!disabled}
+        />
 
       <View style={styles.bonusSection}>
         <View style={styles.switchContainer}>
@@ -65,7 +65,7 @@ const GuessInput = ({ onSubmitGuess, theme, disabled = false }) => {
               onChangeText={setMeaningGuess}
               placeholder="Enter your guess for the definition (for bonus points)"
               multiline
-              disabled={disabled}
+              editable={!disabled}
             />
           </>
         )}
