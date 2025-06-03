@@ -9,3 +9,8 @@ Players are presented with a common phrase or word in a foreign language. They m
    git clone https://github.com/Zmirzz/FluentQuest.git
    cd FluentQuest
    npm install
+   ```
+2. Start the development server
+   ```bash
+   npm start
+   ```
