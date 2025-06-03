@@ -110,6 +110,11 @@ export const getCurrentDailyChallenge = () => {
 
 /**
  * Update the game state after a guess
+ *
+ * Scoring rules:
+ *   - Correct country: 3 points for the daily challenge, 1 point for endless mode.
+ *   - Correct meaning: +5 bonus points regardless of game mode.
+ *
  * @param {Object} currentState - The current game state
  * @param {Object} result - The result object containing countryCorrect and meaningCorrect
  * @param {number} wordId - The ID of the word that was guessed
@@ -138,7 +143,12 @@ export const updateGameStateAfterGuess = async (currentState, result, wordId, hi
   } else {
     newState.streak = 0; // Reset streak on incorrect country guess
   }
-  
+
+  // Bonus for guessing the meaning correctly
+  if (meaningCorrect) {
+    pointsEarned += 5;
+  }
+
   // Update score
   newState.score += pointsEarned;
   newState.hintsUsed += hintsUsed;
