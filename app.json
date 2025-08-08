@@ -5,52 +5,23 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
-    "newArchEnabled": true,
-    "description": "An interactive language learning game where players guess phrases and words from different languages around the world",
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "ios": {
-      "supportsTablet": true
+    "updates": {
+      "fallbackToCacheTimeout": 0
     },
-    "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      },
-      "package": "com.zmirzorg.fluentquest"
-    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": { "supportsTablet": true },
+    "android": { "adaptiveIcon": { "foregroundImage": "./assets/adaptive-icon.png", "backgroundColor": "#FFFFFF" } },
     "web": {
       "favicon": "./assets/favicon.png",
-      "name": "FluentQuest - Language Learning Game",
-      "shortName": "FluentQuest",
-      "description": "Learn languages through an interactive guessing game. Discover phrases from around the world and test your language skills.",
-      "lang": "en",
-      "themeColor": "#ffffff",
-      "backgroundColor": "#ffffff",
-      "metaTags": {
-        "viewport": "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no",
-        "apple-mobile-web-app-capable": "yes",
-        "apple-mobile-web-app-status-bar-style": "black-translucent",
-        "keywords": "language learning, language game, vocabulary game, foreign languages, educational game, language quiz",
-        "author": "FluentQuest Team",
-        "og:type": "website",
-        "og:title": "FluentQuest - Interactive Language Learning Game",
-        "og:description": "Learn languages through an interactive guessing game. Discover phrases from around the world and test your language skills.",
-        "og:image": "./assets/logo.png",
-        "twitter:card": "summary_large_image",
-        "twitter:title": "FluentQuest - Language Learning Game",
-        "twitter:description": "Learn languages through an interactive guessing game. Discover phrases from around the world."
-      }
-    },
-    "extra": {
-      "eas": {
-        "projectId": "10dda201-a8f3-4b61-a58e-da6433964014"
-      }
-    },
-    "owner": "zmirz-org"
+      "bundler": "metro"
+    }
   }
 }
+

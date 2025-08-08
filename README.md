@@ -1,34 +1,32 @@
-# FluentQuest
+# FluentQuest (Clean Rebuild)
 
-## Project Description
-Players are presented with a common phrase or word in a foreign language. They must guess its meaning and the country of origin. Hints can include contextual usage or related words.
+A simple language guessing game built with Expo/React Native. Guess the country of origin for a word and optionally its meaning for bonus points. Includes a daily challenge with higher points and single-score per day.
 
-## Installation
-1. Clone the repository
-   ```bash
-   git clone https://github.com/Zmirzz/FluentQuest.git
-   cd FluentQuest
-   ```
-2. Install dependencies
-   ```bash
-   npm install
-   ```
-3. Start the development server
-   ```bash
-   npm start
-   ```
-4. Run the web version
-   ```bash
-   npm run web
-   ```
+## Features
+- Core play: country (+1) and meaning bonus (+5), streak on correct country.
+- Daily challenge: +3 for country; prevents double-scoring per day.
+- Progress: score, streak, words guessed, last played date via AsyncStorage.
+- Onboarding: username prompt stored locally.
+- Navigation: lightweight in-app navigator (Home, Play, Daily).
 
-## Building for Web
-To generate a production build of the web app run:
-```bash
-expo export -p web
-```
+## Scripts
+- `npm start` — start Expo dev server (choose platform)
+- `npm run web` — run web target in browser
+- `npm run android` / `npm run ios` — open on emulator/device
+- `npm test` — run Jest (no tests included yet)
 
-## Troubleshooting
-If the web version shows a white screen on startup, it may be related to
-`SecureStore` errors. Open your browser's developer console and check for any
-messages. Resolving these errors usually fixes the issue.
+## Structure
+- `App.js`, `index.js`
+- `src/`
+  - `screens/` — `HomeScreen`, `PlayScreen`, `DailyChallengeScreen`
+  - `components/` — `UsernameModal`
+  - `navigation/` — `AppNavigator`
+  - `context/` — `GameContext`
+  - `utils/` — `storage`
+  - `data/` — `words.js`
+- `assets/` — icons, splash, etc. (preserved)
+
+## Notes
+- The words dataset is a small inline list in `src/data/words.js`. Expand or wire to your source as needed.
+- State keys use `v3_` prefix to avoid collisions with prior versions.
+

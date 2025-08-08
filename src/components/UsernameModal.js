@@ -1,64 +1,44 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, TouchableOpacity, Modal } from 'react-native';
-import { commonStyles, defaultTheme } from '../utils/theme';
+import React, { useState, useEffect } from 'react';
+import { Modal, View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import { useGame } from '../context/GameContext';
 
-/**
- * UsernameModal prompts the user to enter a username when first visiting the app
- * The username is stored locally and used for the leaderboard
- */
-const UsernameModal = ({ visible, onSubmit }) => {
-  const [username, setUsername] = useState('');
+const UsernameModal = () => {
+  const { loaded, username, updateUsername } = useGame();
+  const [visible, setVisible] = useState(false);
+  const [name, setName] = useState('');
   const [error, setError] = useState('');
 
-  const handleSubmit = () => {
-    if (!username.trim()) {
-      setError('Please enter a username');
-      return;
-    }
+  useEffect(() => {
+    if (loaded && !username) setVisible(true);
+  }, [loaded, username]);
 
-    if (username.trim().length < 3) {
+  const submit = async () => {
+    const trimmed = name.trim();
+    if (trimmed.length < 3) {
       setError('Username must be at least 3 characters');
       return;
     }
-
-    // Clear any previous errors
-    setError('');
-    
-    // Submit the username
-    onSubmit(username.trim());
+    await updateUsername(trimmed);
+    setVisible(false);
   };
 
   return (
-    <Modal
-      visible={visible}
-      transparent={true}
-      animationType="fade"
-      onRequestClose={() => {}}
-    >
-      <View style={styles.modalOverlay}>
-        <View style={styles.modalContent}>
-          <Text style={styles.title}>Welcome to FluentQuest!</Text>
-          
-          <Text style={styles.description}>
-            Please enter a username to track your scores on the leaderboard.
-          </Text>
-          
+    <Modal visible={visible} transparent animationType="fade">
+      <View style={styles.overlay}>
+        <View style={styles.card}>
+          <Text style={styles.title}>Welcome to FluentQuest</Text>
+          <Text style={styles.subtitle}>Choose a username to track your score</Text>
           <TextInput
             style={styles.input}
-            value={username}
-            onChangeText={setUsername}
-            placeholder="Enter your username"
-            maxLength={15}
+            placeholder="Enter username"
+            value={name}
+            onChangeText={(t) => { setName(t); setError(''); }}
             autoFocus
+            maxLength={20}
           />
-          
-          {error ? <Text style={styles.errorText}>{error}</Text> : null}
-          
-          <TouchableOpacity
-            style={styles.button}
-            onPress={handleSubmit}
-          >
-            <Text style={styles.buttonText}>Start Playing</Text>
+          {error ? <Text style={styles.error}>{error}</Text> : null}
+          <TouchableOpacity style={styles.button} onPress={submit}>
+            <Text style={styles.buttonText}>Save</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -67,53 +47,15 @@ const UsernameModal = ({ visible, onSubmit }) => {
 };
 
 const styles = StyleSheet.create({
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-  },
-  modalContent: {
-    backgroundColor: 'white',
-    borderRadius: 10,
-    padding: 20,
-    width: '100%',
-    maxWidth: 400,
-    alignItems: 'center',
-  },
-  title: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: defaultTheme.primary,
-    marginBottom: 15,
-    textAlign: 'center',
-  },
-  description: {
-    fontSize: 16,
-    color: '#555',
-    marginBottom: 20,
-    textAlign: 'center',
-  },
-  input: {
-    ...commonStyles.input,
-    width: '100%',
-    marginBottom: 15,
-  },
-  button: {
-    ...commonStyles.button,
-    backgroundColor: defaultTheme.primary,
-    width: '100%',
-  },
-  buttonText: {
-    color: 'white',
-    fontWeight: 'bold',
-    fontSize: 16,
-  },
-  errorText: {
-    color: 'red',
-    marginBottom: 10,
-  },
+  overlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', alignItems: 'center', justifyContent: 'center', padding: 20 },
+  card: { width: '100%', maxWidth: 420, backgroundColor: '#fff', borderRadius: 10, padding: 20 },
+  title: { fontSize: 20, fontWeight: 'bold', marginBottom: 8, color: '#4A6FA5' },
+  subtitle: { fontSize: 14, color: '#555', marginBottom: 12 },
+  input: { borderWidth: 1, borderColor: '#4A6FA5', borderRadius: 8, padding: 12, backgroundColor: '#fff' },
+  error: { color: '#D32F2F', marginTop: 8 },
+  button: { backgroundColor: '#4A6FA5', marginTop: 16, paddingVertical: 12, borderRadius: 8, alignItems: 'center' },
+  buttonText: { color: '#fff', fontWeight: 'bold' },
 });
 
 export default UsernameModal;
+
