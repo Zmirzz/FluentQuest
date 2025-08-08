@@ -12,19 +12,25 @@ const defaultState = {
 
 const USERNAME_KEY = 'v3_username';
 const GAME_STATE_KEY = 'v3_game_state';
+const LEADERBOARD_KEY = 'v1_leaderboard';
 
 export const GameProvider = ({ children }) => {
   const [loaded, setLoaded] = useState(false);
   const [username, setUsername] = useState(null);
   const [state, setState] = useState(defaultState);
+  const [leaderboard, setLeaderboard] = useState([]);
 
   useEffect(() => {
     const init = async () => {
       const savedUser = await getItem(USERNAME_KEY);
       const savedState = await getItem(GAME_STATE_KEY);
+      const savedLb = await getItem(LEADERBOARD_KEY);
       if (savedUser) setUsername(savedUser);
       if (savedState) {
         try { setState(JSON.parse(savedState)); } catch {}
+      }
+      if (savedLb) {
+        try { setLeaderboard(JSON.parse(savedLb)); } catch {}
       }
       setLoaded(true);
     };
@@ -73,6 +79,16 @@ export const GameProvider = ({ children }) => {
     return { points, state: next };
   };
 
+  const submitScore = async () => {
+    const entry = { username: username || 'Guest', score: state.score, date: new Date().toISOString() };
+    const next = [entry, ...leaderboard]
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 25);
+    setLeaderboard(next);
+    await setItem(LEADERBOARD_KEY, JSON.stringify(next));
+    return next;
+  };
+
   const value = {
     loaded,
     username,
@@ -80,6 +96,8 @@ export const GameProvider = ({ children }) => {
     hasPlayedToday,
     updateUsername,
     recordGuess,
+    leaderboard,
+    submitScore,
   };
 
   return (
@@ -88,4 +106,3 @@ export const GameProvider = ({ children }) => {
 };
 
 export const useGame = () => useContext(GameContext);
-
