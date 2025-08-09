@@ -1,19 +1,39 @@
-import React from 'react';
-import { View, Text, StyleSheet, FlatList } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, FlatList, ActivityIndicator, RefreshControl } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
+import { useGame } from '../context/GameContext';
 
 const LeaderboardScreen = () => {
   const { colors } = useTheme();
   const styles = getStyles(colors);
+  const { leaderboard: ctxLeaderboard, refreshLeaderboard } = useGame();
+  const [loading, setLoading] = useState(true);
+  const [data, setData] = useState([]);
+  const [refreshing, setRefreshing] = useState(false);
 
-  // Dummy data for now
-  const data = [
-    { id: '1', username: 'Player1', score: 1500 },
-    { id: '2', username: 'Player2', score: 1200 },
-    { id: '3', username: 'Player3', score: 1100 },
-    { id: '4', username: 'Player4', score: 1000 },
-    { id: '5', username: 'Player5', score: 900 },
-  ];
+  useEffect(() => {
+    let mounted = true;
+    const load = async () => {
+      try {
+        const fresh = await refreshLeaderboard();
+        if (mounted) setData(fresh || ctxLeaderboard || []);
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    };
+    load();
+    return () => { mounted = false; };
+  }, []);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    try {
+      const fresh = await refreshLeaderboard();
+      setData(fresh || []);
+    } finally {
+      setRefreshing(false);
+    }
+  };
 
   const renderItem = ({ item, index }) => (
     <View style={styles.item}>
@@ -26,7 +46,18 @@ const LeaderboardScreen = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Leaderboard</Text>
-      <FlatList data={data} renderItem={renderItem} keyExtractor={(item) => item.id} />
+      {loading ? (
+        <View style={{ padding: 20 }}>
+          <ActivityIndicator color={colors.primary} />
+        </View>
+      ) : (
+        <FlatList
+          data={data}
+          renderItem={renderItem}
+          keyExtractor={(item, idx) => item.id || String(idx)}
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+        />
+      )}
     </View>
   );
 };

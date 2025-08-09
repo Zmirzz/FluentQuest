@@ -1,5 +1,11 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { setItem, getItem } from '../utils/storage';
+import {
+  getProfile as backendGetProfile,
+  updateUsername as backendUpdateUsername,
+  submitScore as backendSubmitScore,
+  fetchLeaderboard as backendFetchLeaderboard,
+} from '../api/backend';
 
 const GameContext = createContext(null);
 
@@ -22,16 +28,38 @@ export const GameProvider = ({ children }) => {
 
   useEffect(() => {
     const init = async () => {
-      const savedUser = await getItem(USERNAME_KEY);
+      // Load local state
       const savedState = await getItem(GAME_STATE_KEY);
-      const savedLb = await getItem(LEADERBOARD_KEY);
-      if (savedUser) setUsername(savedUser);
       if (savedState) {
         try { setState(JSON.parse(savedState)); } catch {}
       }
-      if (savedLb) {
-        try { setLeaderboard(JSON.parse(savedLb)); } catch {}
+
+      // Try backend profile (falls back to local when in local mode)
+      try {
+        const profile = await backendGetProfile();
+        if (profile?.username) setUsername(profile.username);
+        else {
+          const savedUser = await getItem(USERNAME_KEY);
+          if (savedUser) setUsername(savedUser);
+        }
+      } catch {
+        const savedUser = await getItem(USERNAME_KEY);
+        if (savedUser) setUsername(savedUser);
       }
+
+      // Load leaderboard (backend if available; fallback local)
+      try {
+        const remote = await backendFetchLeaderboard({ limit: 25 });
+        if (remote && Array.isArray(remote) && remote.length) setLeaderboard(remote);
+        else {
+          const savedLb = await getItem(LEADERBOARD_KEY);
+          if (savedLb) { try { setLeaderboard(JSON.parse(savedLb)); } catch {} }
+        }
+      } catch {
+        const savedLb = await getItem(LEADERBOARD_KEY);
+        if (savedLb) { try { setLeaderboard(JSON.parse(savedLb)); } catch {} }
+      }
+
       setLoaded(true);
     };
     init();
@@ -43,8 +71,13 @@ export const GameProvider = ({ children }) => {
   };
 
   const updateUsername = async (name) => {
-    setUsername(name);
-    await setItem(USERNAME_KEY, name);
+    try {
+      const profile = await backendUpdateUsername(name);
+      setUsername(profile?.username || name);
+    } catch {
+      setUsername(name);
+      await setItem(USERNAME_KEY, name);
+    }
   };
 
   const todayStr = () => new Date().toISOString().split('T')[0];
@@ -80,6 +113,14 @@ export const GameProvider = ({ children }) => {
   };
 
   const submitScore = async () => {
+    // Try backend first; fallback to local list
+    try {
+      const remote = await backendSubmitScore({ username, score: state.score });
+      if (remote && Array.isArray(remote)) {
+        setLeaderboard(remote);
+        return remote;
+      }
+    } catch {}
     const entry = { username: username || 'Guest', score: state.score, date: new Date().toISOString() };
     const next = [entry, ...leaderboard]
       .sort((a, b) => b.score - a.score)
@@ -87,6 +128,18 @@ export const GameProvider = ({ children }) => {
     setLeaderboard(next);
     await setItem(LEADERBOARD_KEY, JSON.stringify(next));
     return next;
+  };
+
+  const refreshLeaderboard = async () => {
+    try {
+      const data = await backendFetchLeaderboard({ limit: 25 });
+      if (data && Array.isArray(data)) {
+        setLeaderboard(data);
+        return data;
+      }
+    } catch {}
+    // return local if backend not available
+    return leaderboard;
   };
 
   const value = {
@@ -98,6 +151,7 @@ export const GameProvider = ({ children }) => {
     recordGuess,
     leaderboard,
     submitScore,
+    refreshLeaderboard,
   };
 
   return (
